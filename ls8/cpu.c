@@ -1,4 +1,7 @@
 #include "cpu.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #define DATA_LEN 6
 
@@ -27,14 +30,14 @@ void cpu_load(struct cpu *cpu)
   // TODO: Replace this with something less hard-coded
 }
 
-unsigned char *cpu_ram_read(struct cpu *cpu, unsigned int pc)
+unsigned int cpu_ram_read(struct cpu *cpu, unsigned int pc)
 {
   return cpu->ram[pc];
 }
 
-void cpu_ram_write(struct cpu *cpu, unsigned char *stuff, unsigned int pc)
+void cpu_ram_write(struct cpu *cpu, unsigned int instruction, unsigned int pc)
 {
-  cpu->ram[pc] = stuff;
+  cpu->ram[pc] = instruction;
 }
 /**
  * ALU
@@ -62,11 +65,51 @@ void cpu_run(struct cpu *cpu)
   {
     // TODO
     // 1. Get the value of the current instruction (in address PC).
+    int current_inst = cpu_ram_read(cpu, cpu->pc);
     // 2. Figure out how many operands this next instruction requires
+    int reg_index;
+    int val;
     // 3. Get the appropriate value(s) of the operands following this instruction
     // 4. switch() over it to decide on a course of action.
     // 5. Do whatever the instruction should do according to the spec.
     // 6. Move the PC to the next instruction.
+
+    switch (current_inst)
+    {
+    case LDI:
+      //sets value of register to an int
+      reg_index = cpu_ram_read(cpu, cpu->pc + 1);
+      val = cpu_ram_read(cpu, cpu->pc + 2);
+      cpu->reg[reg_index] = val;
+      cpu->pc += 3; // move to next instruction
+      break;
+
+      // case PRINT_NUM:
+      //   printf("%d\n", memory[pc + 1]);
+      //   pc += 2;
+      //   break;
+
+      // case SAVE_REG:
+      //   reg_num = memory[pc + 1];
+      //   val = memory[pc + 2];
+      //   reg[reg_num] = val;
+      //   pc += 3; // next inst
+      //   break;
+
+      // case PRINT_REG:
+      //   reg_num = memory[pc + 1];
+      //   printf("%d\n", reg[reg_num]);
+      //   pc += 2; // next inst
+      //   break;
+
+    case HLT:
+      running = 0;
+      break;
+
+    default:
+      printf("Unknown instruction at %d: %d\n", cpu->pc, current_inst);
+      exit(1);
+    }
   }
 }
 
