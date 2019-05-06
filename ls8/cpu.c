@@ -65,51 +65,42 @@ void cpu_run(struct cpu *cpu)
   {
     // TODO
     // 1. Get the value of the current instruction (in address PC).
-    int current_inst = cpu_ram_read(cpu, cpu->pc);
+    int IR = cpu_ram_read(cpu, cpu->pc); // instruction register
     // 2. Figure out how many operands this next instruction requires
-    int reg_index;
-    int val;
+    int numOps = IR >> 6;
+
     // 3. Get the appropriate value(s) of the operands following this instruction
+    int ops[4];
+    for (int i = 0; i < numOps; i++)
+    {
+      ops[i] = cpu_ram_read(cpu, cpu->pc + 1 + i);
+    }
+
     // 4. switch() over it to decide on a course of action.
     // 5. Do whatever the instruction should do according to the spec.
-    // 6. Move the PC to the next instruction.
 
-    switch (current_inst)
+    switch (IR)
     {
     case LDI:
       //sets value of register to an int
-      reg_index = cpu_ram_read(cpu, cpu->pc + 1);
-      val = cpu_ram_read(cpu, cpu->pc + 2);
-      cpu->reg[reg_index] = val;
-      cpu->pc += 3; // move to next instruction
+      cpu->reg[ops[0]] = ops[1];
       break;
 
-      // case PRINT_NUM:
-      //   printf("%d\n", memory[pc + 1]);
-      //   pc += 2;
-      //   break;
-
-      // case SAVE_REG:
-      //   reg_num = memory[pc + 1];
-      //   val = memory[pc + 2];
-      //   reg[reg_num] = val;
-      //   pc += 3; // next inst
-      //   break;
-
-      // case PRINT_REG:
-      //   reg_num = memory[pc + 1];
-      //   printf("%d\n", reg[reg_num]);
-      //   pc += 2; // next inst
-      //   break;
+    case PRN:
+      printf("%d\n", cpu->reg[ops[0]]);
+      break;
 
     case HLT:
       running = 0;
       break;
 
     default:
-      printf("Unknown instruction at %d: %d\n", cpu->pc, current_inst);
+      printf("Unknown instruction at %d: %d\n", cpu->pc, IR);
       exit(1);
     }
+
+    // 6. Move the PC to the next instruction.
+    cpu->pc += 1 + numOps;
   }
 }
 
@@ -119,7 +110,6 @@ void cpu_run(struct cpu *cpu)
 void cpu_init(struct cpu *cpu)
 {
   // TODO: Initialize the PC and other special registers
-  cpu = malloc(sizeof(struct cpu));
   cpu->pc = 0;
   memset(cpu->reg, 0, 8 * (sizeof(char)));
   memset(cpu->ram, 0, 128 * sizeof(char));

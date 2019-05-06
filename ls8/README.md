@@ -95,7 +95,7 @@ as necessary. At first, the PC, registers, and RAM should be cleared to zero.
 Later on, you might do further initialization here, e.g. setting the initial
 value of the stack pointer.
 
-## Step 4: Implement the core of `cpu_run()`
+[X] ## Step 4: Implement the core of `cpu_run()`
 
 This is the workhorse function of the entire processor. It's the most difficult
 part to write.
@@ -118,7 +118,7 @@ instruction for the next iteration of the loop in `cpu_run()`. The number of
 bytes an instruction uses can be determined from the two high bits (bits 6-7) of
 the instruction opcode. See the LS-8 spec for details.
 
-## Step 5: Implement the `HLT` instruction handler
+[X] ## Step 5: Implement the `HLT` instruction handler
 
 Add the `HLT` instruction to `cpu.h`.
 
@@ -127,14 +127,14 @@ encountered, regardless of whether or not there are more lines of code in the LS
 
 We can consider `HLT` to be similar to a `return` or `exit()` in that we stop whatever we are doing, wherever we are.
 
-## Step 6: Add the `LDI` instruction
+[X] ## Step 6: Add the `LDI` instruction
 
 This instruction sets a specified register to a specified value.
 
 See the LS-8 spec for the details of what this instructions does and its opcode
 value.
 
-## Step 7: Add the `PRN` instruction
+[X] ## Step 7: Add the `PRN` instruction
 
 This is a very similar process to adding `LDI`, but the handler is simpler. See
 the LS-8 spec.
