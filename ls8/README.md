@@ -142,7 +142,7 @@ the LS-8 spec.
 _At this point, you should be able to run the program and have it print `8` to
 the console!_
 
-## Step 8: Un-hardcode the machine code
+[X] ## Step 8: Un-hardcode the machine code
 
 In `cpu.c`, the LS-8 programs you've been running so far have been hardcoded
 into the source. This isn't particularly user-friendly.
