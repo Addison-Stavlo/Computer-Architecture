@@ -302,7 +302,7 @@ void (*baz[10])(int, float) = {0};
 
 Whether you do a `switch` or a branch table or anything else is up to you.
 
-## Step 11: Implement System Stack
+[X] ## Step 11: Implement System Stack
 
 All CPUs manage a _stack_ that can be used to store information temporarily.
 This stack resides in main memory and typically starts at the top of memory (at

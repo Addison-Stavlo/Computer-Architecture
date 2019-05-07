@@ -103,6 +103,26 @@ void cpu_run(struct cpu *cpu)
       alu(cpu, ALU_MUL, ops[0], ops[1]);
       break;
 
+    case PUSH:
+      // Reg[7] is stack pointer
+      // start of stack at RAM[0xF3]
+      if (cpu->reg[7] == 0)
+      {
+        cpu->reg[7] = 0xF3;
+        cpu->ram[0xF3] = cpu->reg[ops[0]];
+      }
+      else
+      {
+        cpu->reg[7]--;
+        cpu->ram[cpu->reg[7]] = cpu->reg[ops[0]];
+      }
+      break;
+
+    case POP:
+      cpu->reg[ops[0]] = cpu->ram[cpu->reg[7]];
+      cpu->reg[7]++;
+      break;
+
     default:
       printf("Unknown instruction at %d: %d\n", cpu->pc, IR);
       exit(1);
