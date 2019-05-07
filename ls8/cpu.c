@@ -54,7 +54,9 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
   case ALU_MUL:
     cpu->reg[regA] = cpu->reg[regA] * cpu->reg[regB];
     break;
-
+  case ALU_ADD:
+    cpu->reg[regA] = cpu->reg[regA] + cpu->reg[regB];
+    break;
     // TODO: implement more ALU ops
   }
 }
@@ -103,24 +105,49 @@ void cpu_run(struct cpu *cpu)
       alu(cpu, ALU_MUL, ops[0], ops[1]);
       break;
 
+    case ADD:
+      alu(cpu, ALU_ADD, ops[0], ops[1]);
+      break;
     case PUSH:
-      // Reg[7] is stack pointer
+      // reg[7] is stack pointer
       // start of stack at RAM[0xF3]
       if (cpu->reg[7] == 0)
       {
-        cpu->reg[7] = 0xF3;
-        cpu->ram[0xF3] = cpu->reg[ops[0]];
+        cpu->reg[7] = 0xF4;
       }
-      else
-      {
-        cpu->reg[7]--;
-        cpu->ram[cpu->reg[7]] = cpu->reg[ops[0]];
-      }
+      cpu->reg[7]--;
+      cpu->ram[cpu->reg[7]] = cpu->reg[ops[0]];
+
       break;
 
     case POP:
+      if (cpu->reg[7] == 0 || cpu->reg[7] == 0xF4)
+      {
+        fprintf(stderr, "error: no items in stack!\n");
+        break;
+      }
       cpu->reg[ops[0]] = cpu->ram[cpu->reg[7]];
       cpu->reg[7]++;
+      break;
+
+    case CALL:
+      // NOT DRY - copy/pase PUSH code
+      if (cpu->reg[7] == 0)
+      {
+        cpu->reg[7] = 0xF4;
+      }
+      cpu->reg[7]--;
+      cpu->ram[cpu->reg[7]] = cpu->pc + 2;
+
+      cpu->pc = cpu->reg[ops[0]] - 2;
+      break;
+
+    case RET:
+      // NOT DRY - copy/pase POP code
+      cpu->pc = cpu->ram[cpu->reg[7]];
+      cpu->reg[7]++;
+      cpu->pc -= 1 + numOps;
+
       break;
 
     default:
