@@ -3,61 +3,36 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define DATA_LEN 6
-
 /**
  * Load the binary bytes from a .ls8 source file into a RAM array
  */
 void cpu_load(struct cpu *cpu, char *file)
 {
-  char ch;
   FILE *fp;
   fp = fopen(file, "r");
-  int address = 0;
-  char comment = '#';
-  char *buf = malloc(9 * sizeof(char));
-  while ((ch = fgetc(fp)) != EOF)
-  {
-    if (ch != comment)
-    {
-      buf[0] = ch;
-      for (int i = 1; i <= 7; i++)
-      {
-        ch = fgetc(fp);
-        buf[i] = ch;
-      }
-      buf[8] = '\0';
-      long command_value = strtoul(buf, NULL, 2);
 
-      cpu->ram[address++] = command_value;
-    }
-    // read until next line or end of file
-    while (ch != '\n' && ch != EOF)
+  if (fp == NULL)
+  {
+    fprintf(stderr, "comp: error opening file\n");
+    exit(2);
+  }
+
+  int address = 0;
+  char line[256];
+
+  while (fgets(line, 256, fp) != NULL)
+  {
+    char *endptr;
+    unsigned int val = strtoul(line, &endptr, 2);
+    if (endptr == line)
     {
-      ch = fgetc(fp);
+      // no digits found.. goto next read line
+      continue;
     }
+    cpu->ram[address++] = val;
   }
 
   fclose(fp);
-
-  // char data[DATA_LEN] = {
-  //     // From print8.ls8
-  //     0b10000010, // LDI R0,8
-  //     0b00000000,
-  //     0b00001000,
-  //     0b01000111, // PRN R0
-  //     0b00000000,
-  //     0b00000001 // HLT
-  // };
-
-  // int address = 0;
-
-  // for (int i = 0; i < DATA_LEN; i++)
-  // {
-  //   cpu->ram[address++] = data[i];
-  // }
-
-  // TODO: Replace this with something less hard-coded
 }
 
 unsigned int cpu_ram_read(struct cpu *cpu, unsigned int pc)
@@ -77,7 +52,7 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
   switch (op)
   {
   case ALU_MUL:
-    // TODO
+    cpu->reg[regA] = cpu->reg[regA] * cpu->reg[regB];
     break;
 
     // TODO: implement more ALU ops
@@ -122,6 +97,10 @@ void cpu_run(struct cpu *cpu)
 
     case HLT:
       running = 0;
+      break;
+
+    case MUL:
+      alu(cpu, ALU_MUL, ops[0], ops[1]);
       break;
 
     default:

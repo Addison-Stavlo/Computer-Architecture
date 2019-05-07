@@ -187,7 +187,7 @@ comment.
 You'll have to convert the binary strings to integer values to store in RAM. The
 built-in `strtoul()` library function might help you here.
 
-## Step 9: Implement a Multiply and Print the Result
+[X] ## Step 9: Implement a Multiply and Print the Result
 
 Extend your LS8 emulator to support the following program:
 
